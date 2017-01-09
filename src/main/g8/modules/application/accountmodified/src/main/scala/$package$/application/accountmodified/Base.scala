@@ -1,9 +1,9 @@
-package com.example.application.accountmodified
+package $package$.application.accountmodified
 
-import com.example.domain.account.AccountModified
-import com.example.infrastructure.lambda.consumer.handler.BaseKinesisHandler
-import com.example.infrastructure.lambda.consumer.model.KinesisEvent.KinesisEventRecord
-import com.example.infrastructure.lambda.consumer.model.{RetryKinesisFailure, SkipKinesisFailure}
+import $package$.domain.account.AccountModified
+import $package$.infrastructure.lambda.consumer.handler.BaseKinesisHandler
+import $package$.infrastructure.lambda.consumer.model.KinesisEvent.KinesisEventRecord
+import $package$.infrastructure.lambda.consumer.model.{RetryKinesisFailure, SkipKinesisFailure}
 import spray.json._
 
 trait Base extends BaseKinesisHandler {
@@ -12,7 +12,7 @@ trait Base extends BaseKinesisHandler {
   override type Output = Unit
 
   override protected def convert(event: KinesisEventRecord) = {
-    import com.example.infrastructure.domain.account.AccountModifiedJsonProtocol._
+    import $package$.infrastructure.domain.account.AccountModifiedJsonProtocol._
     try {
       Right(JsonParser(event.kinesis.data.array)
         .asJsObject.convertTo[AccountModified])

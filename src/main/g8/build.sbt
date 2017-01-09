@@ -142,7 +142,7 @@ lazy val auth = (project in file("./modules/auth")).
   settings(
     name := "$name$-auth",
     libraryDependencies ++= authDeps,
-    awsLambdaHandler := "com.example.Auth::handleRequest",
+    awsLambdaHandler := "$package$.Auth::handleRequest",
     awsAuthorizerName := "$name$-auth",
     awsIdentitySourceHeaderName := "Authorization",
     awsAuthorizerResultTtlInSeconds := 1800
@@ -157,7 +157,7 @@ lazy val appHello = (project in file("./modules/application/hello")).
   settings(
     name := "$name$-app-hello",
     libraryDependencies ++= appHelloDeps,
-    awsLambdaHandler := "com.example.application.hello.App::handleRequest",
+    awsLambdaHandler := "$package$.application.hello.App::handleRequest",
     awsApiGatewayResourcePath := "/hellos",
     awsApiGatewayResourceHttpMethod := "GET",
     awsApiGatewayIntegrationRequestTemplates := Seq(
@@ -182,7 +182,7 @@ lazy val appAccountModified = (project in file("./modules/application/accountmod
   settings(
     name := "$name$-app-account-modified",
     libraryDependencies ++= appAccountModifiedDeps,
-    awsLambdaHandler := "com.example.application.accountmodified.App::recordHandler",
+    awsLambdaHandler := "$package$.application.accountmodified.App::recordHandler",
     eventSourceNames := Seq("account-modified")
   )
 
