@@ -27,14 +27,11 @@ ApiGateway created: <Rest Api ID>
   -DAWS_ROLE_ARN=arn:aws:iam::<AWS Account ID>:role/<Role Name> \
   -DAWS_BUCKET_NAME=<Bucket Name> \
   -DAUTH_KEY=hoge
+> putApiGateway
+> project auth
 > deploy
-...
-Lambda Deploy: arn:aws:lambda:<Region Name>:<AWS Account ID>:function:SampleHello
-Publish Lambda: arn:aws:lambda:<Region Name>:<AWS Account ID>:function:SampleHello:1
-Create Alias: arn:aws:lambda:<Region Name>:<AWS Account ID>:function:SampleHello:test1
-Create Alias: arn:aws:lambda:<Region Name>:<AWS Account ID>:function:SampleHello:production1
-Api Gateway Deploy
-[success] ...
+> project root
+> deploy
 ```
 
 ## create API Gateway deployment and stage for test.
@@ -64,7 +61,7 @@ test method success.
 | Mon Sep 19 19:56:01 JST 2016   | xxxxxx          | 0.1                            |
 [success] ...
 
-> updateStages xxxxxx
+> deployStages xxxxxx
 [success] ...
 ```
 
@@ -82,6 +79,6 @@ X-Cache: Miss from cloudfront
 Via: 1.1 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.cloudfront.net (CloudFront)
 X-Amz-Cf-Id: xxxxxxx-xxxxxxxxxxxxxxxxxx_xxxxxxxx-xxxxxxxxxxxxxxxxxx==
 
-{"message":"World!!"}%
+{"message":"hello world!"}%
 ```
 
