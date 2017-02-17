@@ -1,11 +1,7 @@
 import Dependencies._
-import RequestTemplates._
-import com.github.yoshiyoshifujii.aws.apigateway._
-import ResponseTemplatePatterns._
+import serverless._
 
 lazy val accountId = sys.props.getOrElse("AWS_ACCOUNT_ID", "")
-lazy val regionName = sys.props.getOrElse("AWS_REGION", "")
-lazy val restApiId = sys.props.getOrElse("AWS_REST_API_ID", "")
 lazy val roleArn = sys.props.getOrElse("AWS_ROLE_ARN", "")
 lazy val bucketName = sys.props.getOrElse("AWS_BUCKET_NAME", "")
 lazy val authKey = sys.props.getOrElse("AUTH_KEY", "")
@@ -30,47 +26,58 @@ val assemblySettings = Seq(
   publishArtifact in (Compile, packageDoc) := false
 )
 
-val awsSettings = Seq(
-  awsRegion := regionName,
-  awsAccountId := accountId
-)
-
-val apiGatewaySettings = awsSettings ++ Seq(
-  awsApiGatewayRestApiId := restApiId,
-  awsApiGatewayYAMLFile := file("./swagger.yaml"),
-  awsApiGatewayResourceUriLambdaAlias := "\${stageVariables.env}",
-  awsApiGatewayStages := Seq(
-    "dev" -> Some("development stage"),
-    "test" -> Some("test stage"),
-    "v1" -> Some("v1 stage")
-  ),
-  awsApiGatewayStageVariables := Map(
-    "dev" -> Map("env" -> "dev", "region" -> regionName),
-    "test" -> Map("env" -> "test", "region" -> regionName),
-    "v1" -> Map("env" -> "production", "region" -> regionName)
-  )
-)
-
-val lambdaSettings = apiGatewaySettings ++ Seq(
-  awsLambdaFunctionName := s"\${name.value}",
-  awsLambdaDescription := "sample-serverless",
-  awsLambdaRole := roleArn,
-  awsLambdaTimeout := 15,
-  awsLambdaMemorySize := 1536,
-  awsLambdaS3Bucket := bucketName,
-  awsLambdaDeployDescription := s"\${version.value}",
-  awsLambdaAliasNames := Seq(
-    "test", "production"
-  )
-)
-
 lazy val root = (project in file(".")).
-  enablePlugins(AWSApiGatewayPlugin).
-  aggregate(appHello, appAccountModified).
+  enablePlugins(ServerlessPlugin).
+  aggregate(auth, appHello, appAccountModified).
   settings(commonSettings: _*).
-  settings(apiGatewaySettings: _*).
   settings(
-    name := "$name$"
+    name := "$name$",
+    serverlessOption := {
+      ServerlessOption(
+        Provider(
+          awsAccount = accountId,
+          deploymentBucket = bucketName,
+          swagger = file("./swagger.yaml"),
+          restApiId = None
+        ),
+        Functions(
+          Function(
+            filePath = (assembly in auth).value,
+            name = (name in auth).value,
+            handler = "$package$.Auth::handleRequest",
+            role = roleArn,
+            events = Events(
+              AuthorizeEvent(
+                name = (name in auth).value
+              )
+            )
+          ),
+          Function(
+            filePath = (assembly in appHello).value,
+            name = (name in appHello).value,
+            handler = "$package$.application.hello.App::handleRequest",
+            role = roleArn,
+            events = Events(
+              HttpEvent(
+                path = "/hellos",
+                method = "GET",
+                cors = true,
+                authorizerName = (name in auth).value,
+                invokeInput = HttpInvokeInput(
+                  headers = Seq("Authorization" -> authKey)
+                )
+              )
+            )
+          ),
+          Function(
+            filePath = (assembly in appAccountModified).value,
+            name = (name in appAccountModified).value,
+            handler = "$package$.application.accountmodified.App::recordHandler",
+            role = roleArn
+          )
+        )
+      )
+    }
   )
 
 lazy val domain = (project in file("./modules/domain")).
@@ -135,54 +142,28 @@ lazy val infraElasticSearch = (project in file("./modules/infrastructure/elastic
   )
 
 lazy val auth = (project in file("./modules/auth")).
-  enablePlugins(AWSCustomAuthorizerPlugin).
   settings(commonSettings: _*).
   settings(assemblySettings: _*).
-  settings(lambdaSettings: _*).
   settings(
     name := "$name$-auth",
-    libraryDependencies ++= authDeps,
-    awsLambdaHandler := "$package$.Auth::handleRequest",
-    awsAuthorizerName := "$name$-auth",
-    awsIdentitySourceHeaderName := "Authorization",
-    awsAuthorizerResultTtlInSeconds := 1800
+    libraryDependencies ++= authDeps
   )
 
 lazy val appHello = (project in file("./modules/application/hello")).
   dependsOn(infraLambda, infraDynamo, infraS3, infraKinesis).
-  enablePlugins(AWSServerlessPlugin).
   settings(commonSettings: _*).
   settings(assemblySettings: _*).
-  settings(lambdaSettings: _*).
   settings(
     name := "$name$-app-hello",
-    libraryDependencies ++= appHelloDeps,
-    awsLambdaHandler := "$package$.application.hello.App::handleRequest",
-    awsApiGatewayResourcePath := "/hellos",
-    awsApiGatewayResourceHttpMethod := "GET",
-    awsApiGatewayIntegrationRequestTemplates := Seq(
-      "application/json" -> AllParameters
-    ),
-    awsApiGatewayIntegrationResponseTemplates := ResponseTemplates(
-      Response200,
-      Response408,
-      Response500
-    ),
-    awsMethodAuthorizerName := "$name$-auth",
-    awsTestHeaders := Seq("Authorization" -> authKey),
-    awsTestSuccessStatusCode := 200
+    libraryDependencies ++= appHelloDeps
   )
 
 lazy val appAccountModified = (project in file("./modules/application/accountmodified")).
   dependsOn(infraLambdaConsumer, infraDomain).
-  enablePlugins(AWSLambdaTriggerKinesisStreamPlugin).
   settings(commonSettings: _*).
   settings(assemblySettings: _*).
-  settings(lambdaSettings: _*).
   settings(
     name := "$name$-app-account-modified",
-    libraryDependencies ++= appAccountModifiedDeps,
-    awsLambdaHandler := "$package$.application.accountmodified.App::recordHandler",
-    eventSourceNames := Seq("account-modified")
+    libraryDependencies ++= appAccountModifiedDeps
   )
 
