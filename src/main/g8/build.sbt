@@ -42,7 +42,7 @@ lazy val root = (project in file(".")).
         ),
         Functions(
           Function(
-            filePath = (assembly in auth).value,
+            filePath = (assemblyOutputPath in assembly in auth).value,
             name = (name in auth).value,
             handler = "$package$.Auth::handleRequest",
             role = roleArn,
@@ -53,7 +53,7 @@ lazy val root = (project in file(".")).
             )
           ),
           Function(
-            filePath = (assembly in appHello).value,
+            filePath = (assemblyOutputPath in assembly in appHello).value,
             name = (name in appHello).value,
             handler = "$package$.application.hello.App::handleRequest",
             role = roleArn,
@@ -70,7 +70,7 @@ lazy val root = (project in file(".")).
             )
           ),
           Function(
-            filePath = (assembly in appAccountModified).value,
+            filePath = (assemblyOutputPath in assembly in appAccountModified).value,
             name = (name in appAccountModified).value,
             handler = "$package$.application.accountmodified.App::recordHandler",
             role = roleArn
