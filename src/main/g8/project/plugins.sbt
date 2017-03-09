@@ -1,1 +1,1 @@
-addSbtPlugin("com.github.yoshiyoshifujii" % "sbt-aws-serverless" % "2.2.1")
+addSbtPlugin("com.github.yoshiyoshifujii" % "sbt-aws-serverless" % "2.5.0")

@@ -36,7 +36,9 @@ lazy val root = (project in file(".")).
       ServerlessOption(
         Provider(
           awsAccount = accountId,
-          deploymentBucket = bucketName,
+          deploymentBucket = bucketName
+        ),
+        ApiGateway(
           swagger = file("./swagger.yaml"),
           restApiId = None
         ),
