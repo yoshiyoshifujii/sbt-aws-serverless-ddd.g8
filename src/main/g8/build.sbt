@@ -39,8 +39,7 @@ lazy val root = (project in file(".")).
           deploymentBucket = bucketName
         ),
         ApiGateway(
-          swagger = file("./swagger.yaml"),
-          restApiId = None
+          swagger = file("./swagger.yaml")
         ),
         Functions(
           Function(
