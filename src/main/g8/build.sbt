@@ -48,6 +48,7 @@ lazy val root = (project in file(".")).
             name = (name in auth).value,
             handler = "$package$.Auth::handleRequest",
             role = roleArn,
+            tracing = Some(Tracing.Active),
             events = Events(
               AuthorizeEvent(
                 name = (name in auth).value
@@ -59,6 +60,7 @@ lazy val root = (project in file(".")).
             name = (name in appHello).value,
             handler = "$package$.application.hello.App::handleRequest",
             role = roleArn,
+            tracing = Some(Tracing.Active),
             events = Events(
               HttpEvent(
                 path = "/hellos",
@@ -75,7 +77,8 @@ lazy val root = (project in file(".")).
             filePath = (assemblyOutputPath in assembly in appAccountModified).value,
             name = (name in appAccountModified).value,
             handler = "$package$.application.accountmodified.App::recordHandler",
-            role = roleArn
+            role = roleArn,
+            tracing = Some(Tracing.Active)
           )
         )
       )

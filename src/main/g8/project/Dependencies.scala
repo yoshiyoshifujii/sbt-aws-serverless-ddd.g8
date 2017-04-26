@@ -8,7 +8,7 @@ object Dependencies {
   val specs2JUnit = "org.specs2" %% "specs2-junit" % "3.8.6"
 
   // Amazon
-  val awsSDKVersion = "1.11.52"
+  val awsSDKVersion = "1.11.123"
   val awsSDKDynamoDB = "com.amazonaws" % "aws-java-sdk-dynamodb" % awsSDKVersion
   val awsSDKS3       = "com.amazonaws" % "aws-java-sdk-s3" % awsSDKVersion
   val awsSDKKinesis  = "com.amazonaws" % "aws-java-sdk-kinesis" % awsSDKVersion
