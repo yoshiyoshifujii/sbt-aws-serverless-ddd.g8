@@ -2,7 +2,7 @@
 swagger: "2.0"
 info:
   version: "0.1"
-  title: "sample-serverless"
+  title: "$name$"
 schemes:
 - "https"
 paths:
