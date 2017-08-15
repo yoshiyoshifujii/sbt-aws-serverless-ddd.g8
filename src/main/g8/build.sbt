@@ -8,7 +8,7 @@ lazy val authKey = sys.props.getOrElse("AUTH_KEY", "")
 
 val commonSettings = Seq(
   version := "$version$",
-  scalaVersion := "2.12.1",
+  scalaVersion := "2.12.3",
   organization := "$organization$",
   libraryDependencies ++= rootDeps
 )

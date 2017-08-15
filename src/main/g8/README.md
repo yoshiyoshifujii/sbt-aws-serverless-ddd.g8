@@ -13,7 +13,7 @@ This project is sample of [sbt-aws-serverlss](https://github.com/yoshiyoshifujii
   -DAWS_BUCKET_NAME=<Bucket Name>
 > assembly
 [success] ...
-> deploy prod
+> serverlessDeploy prod
 ApiGateway created: <Rest Api ID>
 [success] ...
 ```
